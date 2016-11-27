@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+    <style>
+
+
+      h2 {
+        text-align: center;
+        color: black;
+      }
+
+.axis--x path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+    </style>
+    <script type="text/javascript">  
+
+      function draw(raw_data) {
+        "use strict";
+        // TODO somehow margin should be incorporated better
+        var margin = 75,
+            width = 1400 - margin,
+            height = 600 - margin;
+
+
+        var data = d3.nest()
+          .key(function(d) { return d.ListingCreationDate.substring(0, 7); })
+          .rollup(function(v) { return {
+            count: v.length,
+            total: d3.sum(v, function(d) { return d.LoanOriginalAmount; }),
+            avg: d3.mean(v, function(d) { return d.LoanOriginalAmount; })
+          }; })
+          .sortKeys(d3.ascending)
+          .entries(raw_data);
+
+        var parseTime = d3.timeParse("%Y-%m");
+        // console.log(JSON.stringify(aggregatedMetrics));
+        // debugger;
+        d3.select("body")
+          .append("h2")
+          .text("Prosper loan");
+
+        var svg = d3.select("body")
+          .append("svg")
+            .attr("width", width + margin)
+            .attr("height", height + margin),
+          g = svg.append('g').attr("transform", "translate(" + margin + "," + margin + ")");     
+
+        var time_extent = d3.extent(data, function(d) {return new Date(d['key']);});
+        // Find range of attendance column
+        var count_extent = [0, d3.max(data, function(d) { return d['value']['count']; })];
+        //d3.extent(data, function(d) {return d['value']['count'];});
+
+        var x = d3.scaleTime()
+          .rangeRound([margin, width])
+          .domain(time_extent);
+        // Create y-axis scale mapping attendance -> pixels
+        var y = d3.scaleLinear()
+          .rangeRound([height, margin])
+          .domain(count_extent);
+
+        d3.select("svg")
+          .append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + (height) + ")")
+          .call(d3.axisBottom(x));
+
+        d3.select("svg")
+          .append("g")
+          .attr("class", "y axis")
+          .attr("transform", "translate(" + margin + ",0)")
+          .call(d3.axisLeft(y));
+
+        var line = d3.line()
+            .x(function(d) {
+              console.log("plotting x: " + d.key+ " to: " + x(d.key) + " or " + x(new Date(d.key)));
+              return x(new Date(d.key)); 
+            })
+            .y(function(d) { 
+              console.log("plotting y: " + d['value']['count'] + " to: " + y(d['value']['count']));
+              return y(d['value']['count']); 
+            });
+
+
+        g.append("path")
+            .datum(data)
+            .attr("class", "line")
+            .attr("d", line);
+
+
+      }
+    </script>
+  </head>
+<body>
+  <script type="text/javascript">
+  /*
+    Use D3 to load the GeoJSON file
+    */
+    
+d3.csv("prosperLoanData.csv", draw);
+  </script>
+</body>
+</html>
