@@ -1,93 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"
+            type="text/javascript"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="draw.js" type='text/javascript'></script>
     <style>
 
 
-      h2 {
+        h2 {
         text-align: center;
         color: black;
-      }
+        }
 
-.axis--x path {
-  display: none;
-}
+        .axis--x path {
+        display: none;
+        }
 
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
+        .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+        }
+
+        div.buttons {
+        position: fixed;
+        top: 5px;
+        left: 50px;
+        }
+
+        buttons div {
+        background-color: rgb(251, 201, 127);
+        padding: 3px;
+        margin: 7px;
+        }
     </style>
-    <script type="text/javascript">  
 
-      function draw(raw_data) {
-        "use strict";
-        // TODO somehow margin should be incorporated better
-        var margin = 75,
-            width = 1400 - margin,
-            height = 600 - margin;
-
-
-        var data = d3.nest()
-          .key(function(d) { return d.ListingCreationDate.substring(0, 7); })
-          .rollup(function(v) { return {
-            count: v.length,
-            total: d3.sum(v, function(d) { return d.LoanOriginalAmount; }),
-            avg: d3.mean(v, function(d) { return d.LoanOriginalAmount; })
-          }; })
-          .sortKeys(d3.ascending)
-          .entries(raw_data);
-
-
-        var chartData = _.chain(data)
-        .map(function(row, index){
-          // debugg,er;
-          // for each original row, return a new row for each location
-          return {
-              'month' : new Date(row.key),
-              //'name' : location.name,
-              'count' :  row.values.count
-            };
-        })
-        .flatten()
-        .value();
-
-        d3.select("body")
-          .append("h2")
-          .text("Prosper loan");
-
-        var svg = d3.select("body")
-          .append("svg")
-            .attr("width", width + margin)
-            .attr("height", height + margin),
-          g = svg.append('g').attr("transform", "translate(" + margin + "," + margin + ")");     
-         debugger;
-
-         var myChart = new dimple.chart(svg, chartData);
-          var x = myChart.addTimeAxis("x", "month");
-          // x.dateParseFormat('%Y');
-          myChart.addMeasureAxis("y", "count");
-          myChart.addSeries(null, dimple.plot.line);
-          myChart.addSeries(null, dimple.plot.scatter);
-          myChart.draw();
-        
-
-
-      };
-    </script>
-  </head>
+</head>
 <body>
-  <script type="text/javascript">
-  /*
-    Use D3 to load the GeoJSON file
-    */
+<script type="text/javascript">
     
 d3.csv("prosperLoanData.csv", draw);
-  </script>
+
+
+
+
+</script>
 </body>
 </html>
