@@ -51,6 +51,18 @@ function draw(raw_data) {
                return d;
           });
 
+//        var split_by_fields = ['EmploymentStatus', "ProsperRating (numeric)","ProsperRating (Alpha)","ProsperScore","ListingCategory (numeric)"]
+//        var split_by_buttons = d3.select("body")
+//                                       .append("div")
+//                                       .attr("class","btn-group btn-group-justified")
+//                                       .selectAll("div")
+//                                       .data(metrics)
+//                                       .enter()
+//                                       .append("div")
+//                                       .attr("class","btn btn-default")
+//                                       .text(function(d) {
+//                                            return d;
+//                                       });
 
         var svg = d3.select("body")
                .append("svg")
